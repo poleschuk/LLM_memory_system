@@ -1,5 +1,7 @@
 from openai import OpenAI
 
+MODEL_NAME = "moonshotai/Kimi-K2-Instruct-0905"
+
 def chat(client: OpenAI, model_name: str, messages_contain):
     completion = client.chat.completions.create(
         model=model_name,
@@ -9,5 +11,4 @@ def chat(client: OpenAI, model_name: str, messages_contain):
         top_p=1.0
     )
     reply = completion.choices[0].message.content
-    print(f"Alice: {reply}")
     return reply

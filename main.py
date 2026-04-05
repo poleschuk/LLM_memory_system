@@ -5,15 +5,13 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 from memory.short_term_memory import short_term_memory
-from config.LLM_config import chat
+from config.LLM_config import chat, MODEL_NAME
 from memory.embedding.database import embedding_database
 
 client = OpenAI(
     base_url="https://router.huggingface.co/v1",
     api_key=os.environ.get("HUGGINGFACE_API_KEY"),
 )
-
-MODEL_NAME = "moonshotai/Kimi-K2-Instruct-0905"
 
 system_prompt = """
 
@@ -214,8 +212,9 @@ if __name__ == "__main__":
     embedding_database = embedding_database(collections_embed,model_embed)
     while True:
         user_input = input("You: ")
-        short_memory.push({"role": "user", "content": user_input}, embedding_database)
+        short_memory.push({"role": "user", "content": user_input}, embedding_database, client)
 
         ai_reply = chat(client, MODEL_NAME, messages_contain + short_memory.get())
+        print(f"Alice: {ai_reply}")
 
-        short_memory.push({"role": "assistant", "content": ai_reply}, embedding_database)
+        short_memory.push({"role": "assistant", "content": ai_reply}, embedding_database, client)

@@ -10,12 +10,12 @@ class short_term_memory:
     def get(self):
         return list(self.short_term_memory)
 
-    def push(self, message, embedding_database: embedding_database = None):
+    def push(self, text, embedding_database: embedding_database = None, client = None):
         if (len(self.short_term_memory) == self.max_messages):
             if embedding_database:
                 old_message = self.short_term_memory[0]
-                embedding_database.push_message(old_message["content"])
-        self.short_term_memory.append(message)
+                embedding_database.push_message(old_message, client)
+        self.short_term_memory.append(text)
 
     def pop(self):
         if not self.short_term_memory:
