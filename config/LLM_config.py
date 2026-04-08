@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-MODEL_NAME = "moonshotai/Kimi-K2-Instruct-0905"
+MODEL_NAME = "katanemo/Arch-Router-1.5B"
 
 def chat(client: OpenAI, model_name: str, messages_contain):
     completion = client.chat.completions.create(

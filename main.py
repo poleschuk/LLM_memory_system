@@ -1,5 +1,6 @@
 import os
 from openai import OpenAI
+import logging
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -7,6 +8,14 @@ from sentence_transformers import SentenceTransformer
 from memory.short_term_memory import short_term_memory
 from config.LLM_config import chat, MODEL_NAME
 from memory.embedding.database import embedding_database
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger.info("Сообщение через logger")
 
 client = OpenAI(
     base_url="https://router.huggingface.co/v1",
@@ -212,9 +221,19 @@ if __name__ == "__main__":
     embedding_database = embedding_database(collections_embed,model_embed)
     while True:
         user_input = input("You: ")
+        embedding_output = embedding_database.get_embeddings_documents(user_input)
         short_memory.push({"role": "user", "content": user_input}, embedding_database, client)
 
-        ai_reply = chat(client, MODEL_NAME, messages_contain + short_memory.get())
+        if embedding_output:
+            memory_text = "\n".join(embedding_output)
+            messages_contain.append({
+                "role": "system",
+                "content": memory_text,
+            })
+
+        messages = messages_contain + short_memory.get()
+        logger.info(messages)
+        ai_reply = chat(client, MODEL_NAME, messages)
         print(f"Alice: {ai_reply}")
 
         short_memory.push({"role": "assistant", "content": ai_reply}, embedding_database, client)
